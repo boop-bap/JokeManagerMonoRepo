@@ -367,3 +367,6 @@ FodyWeavers.xsd
 
 # Build files
 build_output/
+
+# Exclude DS_Store file
+.DS_Store
