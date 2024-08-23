@@ -1,0 +1,105 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@inject HttpClient Http
+@inject ILogger<Home> Logger
+
+@using JokeUI.Models
+
+<PageTitle>Home</PageTitle>
+
+<div class="container">
+    <div>
+        <h2 class="section-heading">Jokes Fetched So Far</h2>
+        <button class="button" @onclick="GetJoke">Get a Random Joke</button>
+    </div>
+
+    <br />
+
+    <div>
+        <h2 class="section-heading">Submit Your Own Joke</h2>
+
+        <h3>Your Joke</h3>
+        <input class="input-field" @bind="jokeInput" placeholder="Enter your joke here" />
+
+        <h3>Category</h3>
+        <input class="input-field" @bind="categoryInput" placeholder="Enter the category" />
+
+        <br />
+
+        <button class="button" @onclick="AddJoke">Add Joke</button>
+
+        <div class="preview">
+            <h4>Preview:</h4>
+            <ul>
+                <li><strong>Joke:</strong> @newJoke.Content</li>
+                <li><strong>Category:</strong> @newJoke.Category</li>
+            </ul>
+        </div>
+    </div>
+
+    <br />
+
+    <div>
+        <h2 class="section-heading">All Jokes</h2>
+        <ul class="joke-list">
+            @foreach (var joke in jokeList)
+            {
+                <li class="joke-item">
+                    <strong>Joke:</strong> @joke.Content<br />
+                    <strong>Category:</strong> @joke.Category<br />
+                    <strong>ID:</strong> @joke.Id
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+@code {
+    string url = "http://localhost:5087";
+    private static string jokeInput = string.Empty;
+    private static string categoryInput = string.Empty;
+    Joke newJoke = new Joke();
+
+    List<Joke> jokeList = new();
+
+    async Task AddJoke()
+    {
+        newJoke.Content = jokeInput;
+        newJoke.Category = categoryInput;
+
+        try
+        {
+            await Http.PostAsJsonAsync($"{url}/add", newJoke);
+            jokeList.Add(newJoke);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error fetching joke");
+        }
+
+    }
+
+    async Task GetJoke()
+    {
+        try
+        {
+            Joke joke = await Http.GetFromJsonAsync<Joke>($"{url}/random");
+
+           
+            if (joke != null)
+            {
+                jokeList.Add(joke);
+            }
+            else
+            {
+                Logger.LogWarning("No joke found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error fetching joke");
+        }
+    }
+}
