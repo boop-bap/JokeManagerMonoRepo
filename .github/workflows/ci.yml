@@ -44,6 +44,10 @@ jobs:
              if [ -d "$dirToRemove" ]; then
                 # If the BlazorApp directory exists, remove it
                 rm -rf $dirToRemove
+                rm -rf .github
+                rm -rf .vscode
+                rm -rf Tests
+                
                 # Stage the changes
                 git add .
              fi
