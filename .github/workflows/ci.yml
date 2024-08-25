@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/setup-node@v2
@@ -16,6 +18,9 @@ jobs:
           node-version: "16"
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run script
         run: |
@@ -25,36 +30,36 @@ jobs:
           api_branch="API"
           blazorapp_branch="BlazorApp"
 
-          # Function to split changes into a subproject branch
-          split_changes() {
+          # Function to copy directory to a new branch
+          copy_to_branch() {
             dir=$1
             branch=$2
 
             # Check if the branch already exists
             if git rev-parse --verify $branch >/dev/null 2>&1; then
-                # If the branch exists, delete it
-                git branch -D $branch
+              # If the branch exists, delete it
+              git branch -D $branch
             fi
 
             # Create a new branch from the current one
             git checkout -b $branch
 
-            # Add the directory to the new branch and commit
+            # Add the directory to the new branch
             git add $dir
 
             # Check if there are changes to commit
             if git diff-index --quiet HEAD --; then
-             # If there are no changes to commit, do nothing
-             echo "No changes to commit"
+              # If there are no changes to commit, do nothing
+              echo "No changes to commit"
             else
-             # If there are changes to commit, make a commit
-             git commit -m "Initial commit for $branch"
+              # If there are changes to commit, make a commit
+              git commit -m "Copied $dir to $branch"
             fi
+
+            # Push the branch to the remote repository
+            git push --force origin $branch
           }
 
-          # Call the function for each subproject
-          split_changes 'API' $api_branch
-          split_changes 'BlazorApp' $blazorapp_branch
-
-          git push --force origin $api_branch
-          git push --force origin $blazorapp_branch
+          # Call the function for each directory
+          copy_to_branch 'API' $api_branch
+          copy_to_branch 'BlazorApp' $blazorapp_branch
