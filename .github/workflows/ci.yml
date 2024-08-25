@@ -57,7 +57,7 @@ jobs:
             fi
 
             # Push the branch to the remote repository
-            git push --force origin $branch
+            git push --force https://${{ secrets.GITHUB_TOKEN }}@github.com/boop-bap/JokeManagerMonoRepo.git $branch
           }
 
           # Call the function for each directory
