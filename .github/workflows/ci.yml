@@ -20,9 +20,6 @@ jobs:
           token: ${{ secrets.PAT }}
 
       - name: Run script
-        env:
-          PAT: ${{ secrets.PAT }}
-
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
@@ -34,32 +31,35 @@ jobs:
           copy_to_branch() {
             dir=$1
             branch=$2
+            dirToRemove=$3
 
-            # Check if the branch already exists
-            if git rev-parse --verify $branch >/dev/null 2>&1; then
-              # If the branch exists, delete it
-              git branch -D $branch
-            fi
+            # Delete the branch if it exists, both locally and remotely
+            git branch -D $branch || true
+            git push origin --delete $branch || true
 
-            # Create a new branch from the current one
+            # Create a new branch from the current branch and switch to it
             git checkout -b $branch
 
-            # Add the directory to the new branch
-            git add $dir
+            # Check if the to remove directory exists
+            if [ -d "$dirToRemove" ]; then
+                # If the BlazorApp directory exists, remove it
+                rm -rf $dirToRemove
+                # Stage the changes
+                git add .
+            fi
 
-            # Check if there are changes to commit
-            if git diff-index --quiet HEAD --; then
-              # If there are no changes to commit, do nothing
-              echo "No changes to commit"
+            # If there are no changes to commit, print a message
+            if git diff --quiet && git diff --staged --quiet; then
+                echo "No changes to commit"
             else
-              # If there are changes to commit, make a commit
-              git commit -m "Copied $dir to $branch"
+                # If there are changes to commit, make a commit
+                git commit -m "Git Actions Update To $branch"
             fi
 
             # Push the branch to the remote repository
              git push --force https://$PAT@github.com/boop-bap/JokeManagerMonoRepo.git $branch
-          }
+             }
 
-          # Call the function for each directory
-          copy_to_branch 'API' $api_branch
-          copy_to_branch 'BlazorApp' $blazorapp_branch
+            # Call the function for each directory
+            copy_to_branch 'API' $api_branch 'BlazorApp'
+            copy_to_branch 'BlazorApp' $blazorapp_branch 'API'
