@@ -30,18 +30,17 @@ jobs:
              branch=$2
              dirToRemove=$3
 
-            # Delete the branch if it exists, both locally and remotely
-             git branch -D $branch || true
-             git push origin --delete $branch || true
-
-
+             # Check if the branch exists remotely
+             if git ls-remote --quiet --heads origin $branch; then
+               # If the branch exists remotely, delete it
+               git push origin --delete $branch
+             fi
+             
             # Get the name of the branch that triggered the workflow
              current_branch=${GITHUB_REF#refs/heads/}
 
             # Create a new branch from the current branch and switch to it
-             git checkout -b $current_branch
-
-            
+             git checkout -b $branch $current_branch
 
             # Check if the to remove directory exists
              if [ -d "$dirToRemove" ]; then
