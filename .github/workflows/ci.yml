@@ -30,20 +30,19 @@ jobs:
             dir=$1
             branch=$2
 
-            # Create a new branch from an empty commit
-            git checkout --orphan $branch
-
-            # Check if there are any files to remove
-            if [ "$(ls -A .)" ]; then
-              git rm -rf .
+            # Check if the branch already exists
+            if git rev-parse --verify $branch >/dev/null 2>&1; then
+                # If the branch exists, delete it
+                git branch -D $branch
             fi
 
-            git clean -fdx
-            git commit --allow-empty -m "Initial empty commit"
+            # Create a new branch from the current one
+            git checkout -b $branch
 
-            # Filter the branch to only include the subproject directory
-            git filter-branch -f --subdirectory-filter $dir -- --all
-          }
+            # Add the directory to the new branch and commit
+            git add $dir
+            git commit -m "Initial commit for $branch"
+             }
 
           # Call the function for each subproject
           split_changes 'API' $api_branch
