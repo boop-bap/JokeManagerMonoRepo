@@ -41,8 +41,16 @@ jobs:
 
             # Add the directory to the new branch and commit
             git add $dir
-            git commit -m "Initial commit for $branch"
-             }
+
+            # Check if there are changes to commit
+            if git diff-index --quiet HEAD --; then
+             # If there are no changes to commit, do nothing
+             echo "No changes to commit"
+            else
+             # If there are changes to commit, make a commit
+             git commit -m "Initial commit for $branch"
+            fi
+          }
 
           # Call the function for each subproject
           split_changes 'API' $api_branch
