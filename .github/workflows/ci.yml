@@ -40,5 +40,5 @@ jobs:
                 split_changes 'API' $api_branch
                 split_changes 'BlazorApp' $blazorapp_branch
                 
-                git push origin $api_branch
-                git push origin $blazorapp_branch
+                git push  --force origin $api_branch
+                git push  --force origin $blazorapp_branch
