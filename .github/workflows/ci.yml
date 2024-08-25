@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      PAT: ${{ secrets.PAT }}
-
     steps:
       - uses: actions/setup-node@v2
         with:
@@ -23,6 +20,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run script
+        env:
+          PAT: ${{ secrets.PAT }}
+
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
