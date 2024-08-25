@@ -30,14 +30,14 @@ jobs:
             dir=$1
             branch=$2
 
-            # Check if branch exists and if it does, delete it
-            if git show-ref --verify --quiet refs/heads/$branch; then
-              git branch -D $branch
-            fi
-
             # Create a new branch from an empty commit
             git checkout --orphan $branch
-            git rm -rf .
+
+            # Check if there are any files to remove
+            if [ "$(ls -A .)" ]; then
+              git rm -rf .
+            fi
+
             git clean -fdx
             git commit --allow-empty -m "Initial empty commit"
 
