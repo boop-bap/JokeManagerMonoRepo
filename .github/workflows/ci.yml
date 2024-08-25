@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [dev]
+    branches: [main, dev]
   pull_request:
-    branches: [dev]
+    branches: [main, dev]
 
 jobs:
   build:
@@ -24,9 +24,6 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
 
-          api_branch="API"
-          blazorapp_branch="BlazorApp"
-
           # Function to copy directory to a new branch
            copy_to_branch() {
              dir=$1
@@ -37,8 +34,14 @@ jobs:
              git branch -D $branch || true
              git push origin --delete $branch || true
 
+
+            # Get the name of the branch that triggered the workflow
+             current_branch=${GITHUB_REF#refs/heads/}
+
             # Create a new branch from the current branch and switch to it
-             git checkout -b $branch
+             git checkout -b $current_branch
+
+            
 
             # Check if the to remove directory exists
              if [ -d "$dirToRemove" ]; then
@@ -47,7 +50,7 @@ jobs:
                 rm -rf .github
                 rm -rf .vscode
                 rm -rf Tests
-                
+
                 # Stage the changes
                 git add .
              fi
@@ -60,13 +63,18 @@ jobs:
                 git commit -m "Git Actions Update To $branch"
              fi
 
-            # Push the branch to the remote repository
-             git push --force https://$PAT@github.com/boop-bap/JokeManagerMonoRepo.git $branch
+             # Push the branch to the remote repository
+              git push --force https://$PAT@github.com/boop-bap/JokeManagerMonoRepo.git $branch
 
-             # Checkout back to dev
-              git checkout dev
+             # Checkout back to the branch that triggered the workflow
+              git checkout $current_branch
              }
 
-            # Call the function for each directory
-            copy_to_branch 'API' $api_branch 'BlazorApp'
-            copy_to_branch 'BlazorApp' $blazorapp_branch 'API'
+             # Call the function for each directory
+             if [[ "${GITHUB_REF#refs/heads/}" == "main" ]]; then
+               copy_to_branch 'API' 'main-isolated-api' 'BlazorApp'
+               copy_to_branch 'BlazorApp' 'main-isolated-blazorapp' 'API'
+             else
+               copy_to_branch 'API' 'dev-isolated-api' 'BlazorApp'
+               copy_to_branch 'BlazorApp' 'dev-isolated-blazorapp' 'API'
+             fi
