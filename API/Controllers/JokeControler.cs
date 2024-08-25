@@ -76,5 +76,16 @@ namespace JokeAPI.Controllers
             }
             return Ok(joke);
         }
+
+        [HttpDelete("ssssss/{id}")]
+        public ActionResult<Joke> Delete(int id)
+        {
+            var joke = _jokeService.DeleteJoke(id);
+            if (joke == null)
+            {
+                return NotFound();
+            }
+            return Ok(joke);
+        }
     }
 }
