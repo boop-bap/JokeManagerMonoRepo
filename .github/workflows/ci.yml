@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PAT: ${{ secrets.PAT }}
 
     steps:
       - uses: actions/setup-node@v2
@@ -57,7 +57,7 @@ jobs:
             fi
 
             # Push the branch to the remote repository
-             git push --force https://$GITHUB_TOKEN@github.com/boop-bap/JokeManagerMonoRepo.git $branch
+             git push --force https://$PAT@github.com/boop-bap/JokeManagerMonoRepo.git $branch
           }
 
           # Call the function for each directory
