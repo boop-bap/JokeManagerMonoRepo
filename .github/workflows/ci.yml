@@ -26,15 +26,20 @@ jobs:
               dir=$1
               branch=$2
 
-              # Check if the branch already exists
-              if git show-ref --verify --quiet refs/heads/$branch; then
-                  # If the branch exists, checkout to it and merge the changes from the dev branch
-                  git checkout $branch
-                  git merge --allow-unrelated-histories dev
+              # Check if there are any commits affecting the directory
+              if git log -- $dir; then
+                  # Check if the branch already exists
+                  if git show-ref --verify --quiet refs/heads/$branch; then
+                      # If the branch exists, checkout to it and merge the changes from the dev branch
+                      git checkout $branch
+                      git merge --allow-unrelated-histories dev
+                  else
+                      # If the branch does not exist, create it and filter it to only include the subproject directory
+                      git checkout -b $branch
+                      git filter-branch -f --subdirectory-filter $dir -- --all
+                  fi
               else
-                  # If the branch does not exist, create it and filter it to only include the subproject directory
-                  git checkout -b $branch
-                  git filter-branch --subdirectory-filter $dir -- --all
+                  echo "No commits affecting $dir found."
               fi
           }
 
