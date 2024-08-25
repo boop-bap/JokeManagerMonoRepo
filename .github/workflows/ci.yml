@@ -34,7 +34,7 @@ jobs:
               else
                   # If the branch does not exist, create it and filter it to only include the subproject directory
                   git checkout -b $branch
-                  git filter-branch --subdirectory-filter $dir -- --all
+                  git filter-branch -f --subdirectory-filter $dir -- --all
               fi
           }
 
