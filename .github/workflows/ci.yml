@@ -24,30 +24,21 @@ jobs:
 
           # Function to split changes into a subproject branch
           split_changes() {
-          dir=$1
-          branch=$2
-
-          # Check if there are any commits affecting the directory
-          if git diff --quiet HEAD $dir; then
-              echo "No changes in $dir. Skipping..."
-              return
-          fi
-
-          # Check if the branch already exists
-          if git show-ref --verify --quiet refs/heads/$branch; then
-              # If the branch exists, checkout to it and merge the changes from the dev branch
-              git checkout $branch
-              git merge --allow-unrelated-histories dev
-          else
-              # If the branch does not exist, create it and filter it to only include the subproject directory
-              git checkout -b $branch
-              git filter-branch -f --subdirectory-filter $dir -- --all
-          fi
-          }
-
-          # Call the function for each subproject
-          split_changes 'API' $api_branch
-          split_changes 'BlazorApp' $blazorapp_branch
-
-          git push origin $api_branch
-          git push origin $blazorapp_branch
+                dir=$1
+                branch=$2
+            
+                # Create a new branch from an empty commit
+                git checkout --orphan $branch
+                git rm -rf .
+                git clean -fdx
+                git commit --allow-empty -m "Initial empty commit"
+            
+                # Filter the branch to only include the subproject directory
+                git filter-branch -f --subdirectory-filter $dir -- --all }
+                
+                # Call the function for each subproject
+                split_changes 'API' $api_branch
+                split_changes 'BlazorApp' $blazorapp_branch
+                
+                git push origin $api_branch
+                git push origin $blazorapp_branch
