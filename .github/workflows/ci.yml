@@ -19,6 +19,9 @@ jobs:
 
       - name: Run script
         run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+
           api_branch="API"
           blazorapp_branch="BlazorApp"
 
