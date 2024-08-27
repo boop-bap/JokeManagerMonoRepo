@@ -3,13 +3,11 @@
   "tasks": [
     {
       "label": "build-api",
-      "command": "dotnet",
+      "command": "bash",
       "type": "shell",
       "args": [
-        "build",
-        "${workspaceFolder}/API/JokeAPI.csproj",
-        "-o",
-        "${workspaceFolder}/API/build_output"
+        "-c",
+        "dotnet build \"${workspaceFolder}/API/JokeAPI.csproj\" -o \"${workspaceFolder}/API/build_output\""
       ],
       "group": {
         "kind": "build",
@@ -22,13 +20,11 @@
     },
     {
       "label": "build-blazorapp",
-      "command": "dotnet",
+      "command": "bash",
       "type": "shell",
       "args": [
-        "build",
-        "${workspaceFolder}/BlazorApp/JokeUI.csproj",
-        "-o",
-        "${workspaceFolder}/BlazorApp/build_output"
+        "-c",
+        "dotnet build \"${workspaceFolder}/BlazorApp/JokeUI.csproj\" -o \"${workspaceFolder}/BlazorApp/build_output\""
       ],
       "group": {
         "kind": "build",
