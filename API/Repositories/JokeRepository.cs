@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using JokeAPI.Entities;
 using JokeAPI.Interfaces;
-using JokeAPI.Repositories.JokeContext;
+using JokeAPI.Data.DatabaseContext;
 
 namespace JokeAPI.Repositories
 {
     public class JokeRepository : IJokeRepository
     {
-        private readonly JokeContext.JokeContextClass _context;
+        private readonly DatabaseContextClass _context;
 
-        public JokeRepository(JokeContext.JokeContextClass context)
+        public JokeRepository(DatabaseContextClass context)
         {
             _context = context;
         }
@@ -25,7 +25,6 @@ namespace JokeAPI.Repositories
             return _context.Jokes.FirstOrDefault(j => j.Id == id);
         }
 
-
         public void AddJoke(Joke joke)
         {
             _context.Jokes.Add(joke);
@@ -35,8 +34,11 @@ namespace JokeAPI.Repositories
         public void RemoveJoke(int id)
         {
             var jokeToRemove = GetById(id);
-            _context.Jokes.Remove(jokeToRemove);
-            _context.SaveChanges();
+            if (jokeToRemove != null)
+            {
+                _context.Jokes.Remove(jokeToRemove);
+                _context.SaveChanges();
+            }
         }
     }
 }
