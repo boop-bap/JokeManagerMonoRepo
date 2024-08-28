@@ -17,9 +17,11 @@ builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Register custom services
+// Register custobuilder.Services.AddScoped<IJokeRepository, JokeRepository>();
 builder.Services.AddScoped<IJokeRepository, JokeRepository>();
 builder.Services.AddScoped<JokeService>(); // Use AddScoped instead of AddSingleton
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
 
 // Register DbContext
 builder.Services.AddDbContext<DatabaseContextClass>(options =>

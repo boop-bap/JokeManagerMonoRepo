@@ -41,7 +41,7 @@ namespace JokeAPI.Controllers
             return Ok("Hello");
         }
 
-        [HttpPost]
+        [HttpPost("/add")]
         public ActionResult<Joke> Post([FromBody] Joke joke)
         {
             _jokeService.AddJoke(joke.Content, joke.Category);
