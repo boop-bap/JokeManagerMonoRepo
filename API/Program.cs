@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using JokeAPI.Repositories.JokeContext;
+using JokeAPI.Data.DatabaseContext;
 using JokeAPI.Services;
 using JokeAPI.Repositories;
 using JokeAPI.Interfaces;
@@ -22,8 +22,17 @@ builder.Services.AddScoped<IJokeRepository, JokeRepository>();
 builder.Services.AddScoped<JokeService>(); // Use AddScoped instead of AddSingleton
 
 // Register DbContext
-builder.Services.AddDbContext<JokeContextClass>(options =>
+builder.Services.AddDbContext<DatabaseContextClass>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configure CORS policy if needed
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
