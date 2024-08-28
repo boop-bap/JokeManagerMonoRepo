@@ -7,6 +7,8 @@
 
     <BaseOutputPath>./build_output/bin/</BaseOutputPath>
     <BaseIntermediateOutputPath>./build_output/obj/</BaseIntermediateOutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
   </PropertyGroup>
 
   <ItemGroup>
