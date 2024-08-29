@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using JokeAPI.Services;
 using JokeAPI.Entities;
+using JokeAPI.Interfaces;
 using System.Threading.Tasks;
 
 namespace JokeAPI.Controllers
@@ -9,9 +10,9 @@ namespace JokeAPI.Controllers
     [Route("api/users")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
