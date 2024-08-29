@@ -1,25 +1,43 @@
-using System;
-using System.Collections.Generic;
-using JokeAPI.Entities;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using JokeAPI.Interfaces;
+using JokeAPI.Entities;
+using JokeAPI.Services;
 
 namespace JokeAPI.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        
-            private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly ITokenService _tokenService;
+        public UserService(UserManager<User> userManager, ITokenService tokenService)
+        {
+            _userManager = userManager;
+            _tokenService = tokenService;
+        }
 
-            public UserService(IUserRepository userRepository)
+        public async Task<(IdentityResult, string)> AddUserAsync(User user, string password)
+        {
+            var newUser = new User 
+            { 
+                UserName = user.DisplayName, 
+                DisplayName = user.DisplayName,  
+                Email = user.Email, 
+                Role = user.Role, 
+                PasswordHash = user.PasswordHash, 
+                PasswordSalt = user.PasswordSalt, 
+                Permissions = user.Permissions 
+            };
+
+            var result = await _userManager.CreateAsync(newUser, password);
+
+            if (result.Succeeded)
             {
-                _userRepository = userRepository;
+                var token = _tokenService.GenerateJwtToken(newUser.Id);
+                return (result, token);
             }
 
-            public void AddUser(string username, string email)
-            {
-                var newUser = new User {Username = username, Email = email, PasswordHash = "ILoveBanana", PasswordSalt = "4321" };
-                 _userRepository.AddUser(newUser);
-
-            }
+            return (result, null);
+        }
     }
 }

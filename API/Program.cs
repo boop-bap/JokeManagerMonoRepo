@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using DotNetEnv;
+
 using JokeAPI.Data.DatabaseContext;
 using JokeAPI.Services;
 using JokeAPI.Repositories;
 using JokeAPI.Interfaces;
-using DotNetEnv;
+using JokeAPI.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,15 +20,20 @@ builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Register custobuilder.Services.AddScoped<IJokeRepository, JokeRepository>();
-builder.Services.AddScoped<IJokeRepository, JokeRepository>();
-builder.Services.AddScoped<JokeService>(); // Use AddScoped instead of AddSingleton
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<UserService>();
+
+// Register services
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IJokeService, JokeService>();
 
 // Register DbContext
 builder.Services.AddDbContext<DatabaseContextClass>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Identity services
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<DatabaseContextClass>()
+    .AddDefaultTokenProviders();
 
 // Configure CORS policy if needed
 builder.Services.AddCors(options =>
@@ -40,6 +48,15 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseRouting();
+
+app.UseCors("AllowAll");
+
+app.UseAuthorization();
 
 app.MapControllers();
 

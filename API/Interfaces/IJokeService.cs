@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JokeAPI.Entities;
 using JokeAPI.Interfaces;
 
 namespace JokeAPI.Services
 {
-    public class JokeService : IJokeService
+    public class JokeService
     {
         private readonly IJokeRepository _jokeRepository;
 
