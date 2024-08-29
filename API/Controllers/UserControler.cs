@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using JokeAPI.Services;
 using JokeAPI.Entities;
 using JokeAPI.Interfaces;
-using JokeAPI.DTO
+using JokeAPI.DTO;
 
 namespace JokeAPI.Controllers
 {
@@ -41,9 +41,9 @@ namespace JokeAPI.Controllers
 
         // POST: api/users
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] UserDto user, string password)
+        public async Task<IActionResult> AddUser([FromBody] UserDto user)
         {
-            var (result, token) = await _userService.AddUserAsync(user, password);
+            var (result, token) = await _userService.AddUserAsync(user);
 
             if (result.Succeeded)
             {

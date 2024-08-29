@@ -17,7 +17,7 @@ namespace JokeAPI.Services
             _tokenService = tokenService;
         }
 
-        public async Task<(IdentityResult, string)> AddUserAsync(UserDto user, string password)
+        public async Task<(IdentityResult, string)> AddUserAsync(UserDto user)
         {
 
               // Generate salt
@@ -29,7 +29,7 @@ namespace JokeAPI.Services
             // Create the user entity
             var newUser = new User
             {
-                DisplayName = user.DisplayName,
+                UserName = user.UserName,
                 Email = user.Email,
                 PasswordHash = hashedPassword,
                 PasswordSalt = salt,
@@ -37,14 +37,15 @@ namespace JokeAPI.Services
                 Permissions = user.Permissions
             };
 
-            var result = await _userManager.CreateAsync(newUser, hashedPassword);
+            var result = await _userManager.CreateAsync(newUser);
 
             if (result.Succeeded)
             {
-                return Ok(new { Token = token });
+                var token = _tokenService.GenerateJwtToken(newUser.Id);
+                return (result, token);
             }
 
-            return BadRequest(result.Errors);
+            return (result, null);
         }
 
         private static string GenerateSalt()
