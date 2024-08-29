@@ -41,7 +41,7 @@ namespace JokeAPI.Services
 
             if (result.Succeeded)
             {
-                var token = _tokenService.GenerateJwtToken(newUser.Id);
+                var token = _tokenService.GenerateJwtToken(user.Id);
                 return (result, token);
             }
 

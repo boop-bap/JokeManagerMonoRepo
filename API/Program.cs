@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Load environment variables from .env file
 Env.Load();
 
-var connectionString = $"Host={Environment.GetEnvironmentVariable("DB_HOST")};Port={Environment.GetEnvironmentVariable("DB_PORT")};Database={Environment.GetEnvironmentVariable("DB_NAME")};Username={Environment.GetEnvironmentVariable("DB_USER")};Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};SslMode=Require;Trust Server Certificate=true";
+var connectionString = $"Host=roundhouse.proxy.rlwy.net;Port=17016;Database=railway;Username={Environment.GetEnvironmentVariable("DB_USER")};Password={Environment.GetEnvironmentVariable("DB_PASSWORD")}";
 
 // Add services to the container.
 builder.Services.AddControllers();
