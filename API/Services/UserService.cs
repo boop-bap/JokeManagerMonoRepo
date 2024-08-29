@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using JokeAPI.Interfaces;
 using JokeAPI.Entities;
+using JokeAPI.DTO;
 using JokeAPI.Services;
 
 namespace JokeAPI.Services
@@ -16,28 +17,52 @@ namespace JokeAPI.Services
             _tokenService = tokenService;
         }
 
-        public async Task<(IdentityResult, string)> AddUserAsync(User user, string password)
+        public async Task<(IdentityResult, string)> AddUserAsync(UserDto user, string password)
         {
-            var newUser = new User 
-            { 
-                UserName = user.DisplayName, 
-                DisplayName = user.DisplayName,  
-                Email = user.Email, 
-                Role = user.Role, 
-                PasswordHash = user.PasswordHash, 
-                PasswordSalt = user.PasswordSalt, 
-                Permissions = user.Permissions 
+
+              // Generate salt
+            var salt = GenerateSalt();
+
+            // Hash the password with the salt
+            var hashedPassword = HashPassword(user.Password, salt);
+
+            // Create the user entity
+            var newUser = new User
+            {
+                DisplayName = user.DisplayName,
+                Email = user.Email,
+                PasswordHash = hashedPassword,
+                PasswordSalt = salt,
+                Role = user.Role,
+                Permissions = user.Permissions
             };
 
-            var result = await _userManager.CreateAsync(newUser, password);
+            var result = await _userManager.CreateAsync(newUser, hashedPassword);
 
             if (result.Succeeded)
             {
-                var token = _tokenService.GenerateJwtToken(newUser.Id);
-                return (result, token);
+                return Ok(new { Token = token });
             }
 
-            return (result, null);
+            return BadRequest(result.Errors);
+        }
+
+        private static string GenerateSalt()
+        {
+            var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
+            var saltBytes = new byte[16];
+            rng.GetBytes(saltBytes);
+            return Convert.ToBase64String(saltBytes);
+        }
+        
+
+        private static string HashPassword(string password, string salt)
+        {
+            var sha256 = System.Security.Cryptography.SHA256.Create();
+            var saltedPassword = password + salt;
+            var saltedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(saltedPassword);
+            var hashBytes = sha256.ComputeHash(saltedPasswordBytes);
+            return Convert.ToBase64String(hashBytes);
         }
     }
 }

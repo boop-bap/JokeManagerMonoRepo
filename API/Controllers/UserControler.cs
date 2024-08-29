@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+
 using JokeAPI.Services;
 using JokeAPI.Entities;
 using JokeAPI.Interfaces;
-using System.Threading.Tasks;
+using JokeAPI.DTO
 
 namespace JokeAPI.Controllers
 {
@@ -39,7 +41,7 @@ namespace JokeAPI.Controllers
 
         // POST: api/users
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] User user, string password)
+        public async Task<IActionResult> AddUser([FromBody] UserDto user, string password)
         {
             var (result, token) = await _userService.AddUserAsync(user, password);
 
