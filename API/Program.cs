@@ -22,6 +22,9 @@ builder.Services.AddControllers();
 
 
 // Register services
+builder.Services.AddScoped<IJokeRepository, JokeRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJokeService, JokeService>();
