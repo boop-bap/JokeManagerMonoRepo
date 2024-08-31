@@ -1,30 +1,33 @@
 using Microsoft.AspNetCore.Mvc;
 using JokeAPI.Services;
 using JokeAPI.Entities;
+using JokeAPI.Interfaces;
+using System.Collections.Generic;
 
 namespace JokeAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/jokes")]
     public class JokeController : ControllerBase
     {
-        private readonly JokeService _jokeService;
+        private readonly IJokeService _jokeService;
 
-        public JokeController(JokeService jokeService)
+        public JokeController(IJokeService jokeService)
         {
             _jokeService = jokeService;
         }
 
-        [HttpGet("/all")]
-        public ActionResult<IEnumerable<Joke>> Get()
+        // GET: api/jokes
+        [HttpGet]
+        public ActionResult<IEnumerable<Joke>> GetAll()
         {
-            var jokes = _jokeService.GetJokes();
+            var jokes = _jokeService.GetAllJokes();
             return Ok(jokes);
         }
 
-
-        [HttpGet("/{id}")]
-        public ActionResult<Joke> Get(int id)
+        // GET: api/jokes/{id}
+        [HttpGet("{id}")]
+        public ActionResult<Joke> GetById(int id)
         {
             var joke = _jokeService.GetJokeById(id);
             if (joke == null)
@@ -34,22 +37,17 @@ namespace JokeAPI.Controllers
             return Ok(joke);
         }
 
-        [HttpGet("/testas")]
-        public ActionResult<Joke> Testing(int id)
+        // POST: api/jokes
+        [HttpPost]
+        public ActionResult<Joke> Create([FromBody] Joke joke)
         {
-            
-            return Ok("Hello");
+            _jokeService.AddJoke(joke);
+            return CreatedAtAction(nameof(GetById), new { id = joke.Id }, joke);
         }
-
-        [HttpPost("/add")]
-        public ActionResult<Joke> Post([FromBody] Joke joke)
-        {
-            _jokeService.AddJoke(joke.Content, joke.Category);
-            return CreatedAtAction(nameof(Get), new { id = joke.Id }, joke);
-        }
-
-        [HttpGet("/random")]
-        public ActionResult<Joke> Random()
+    
+        // GET: api/jokes/random
+        [HttpGet("random")]
+        public ActionResult<Joke> GetRandom()
         {
             var joke = _jokeService.GetRandomJoke();
             return Ok(joke);

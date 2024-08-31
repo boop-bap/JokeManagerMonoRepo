@@ -5,7 +5,7 @@ using JokeAPI.Interfaces;
 
 namespace JokeAPI.Services
 {
-    public class JokeService
+    public class JokeService : IJokeService
     {
         private readonly IJokeRepository _jokeRepository;
 
@@ -14,7 +14,7 @@ namespace JokeAPI.Services
             _jokeRepository = jokeRepository;
         }
 
-        public IEnumerable<Joke> GetJokes()
+        public IEnumerable<Joke> GetAllJokes()
         {
             return _jokeRepository.GetAll();
         }
@@ -24,9 +24,9 @@ namespace JokeAPI.Services
             return _jokeRepository.GetById(id);
         }
 
-        public void AddJoke(string content, string category)
+        public void AddJoke(Joke joke)
         {
-            var newJoke = new Joke { Content = content, Category = category };
+            var newJoke = new Joke { Content = joke.Content, Category = joke.Category, UserId = 1 };
             _jokeRepository.AddJoke(newJoke);
         }
 
