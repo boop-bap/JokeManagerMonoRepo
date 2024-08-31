@@ -1,9 +1,11 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+
 using JokeAPI.Interfaces;
 
 namespace JokeAPI.Services
@@ -14,33 +16,43 @@ namespace JokeAPI.Services
 
         public TokenService(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public string GenerateJwtToken(int userId)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            // Retrieve the private key from configuration
+            string privateKeyPem = _configuration["Jwt:PrivateKey"];
+            if (string.IsNullOrEmpty(privateKeyPem))
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", userId.ToString()) }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"],
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        public string GenerateSecretKey()
-        {
-            using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider())
-            {
-                var keyBytes = new byte[32]; // 256 bits
-                rng.GetBytes(keyBytes);
-                return Convert.ToBase64String(keyBytes);
+                throw new ArgumentNullException(nameof(privateKeyPem), "JWT private key cannot be null or empty.");
             }
+
+            // Convert the PEM format key to an ECDsa object
+            var ecdsa = ECDsa.Create();
+            ecdsa.ImportFromPem(privateKeyPem.ToCharArray());
+
+            // Create the security key
+            var key = new ECDsaSecurityKey(ecdsa);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.EcdsaSha256);
+
+            // Define the claims
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            // Create the token
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: creds);
+
+            // Return the token
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

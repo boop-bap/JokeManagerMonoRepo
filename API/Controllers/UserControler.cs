@@ -45,7 +45,7 @@ namespace JokeAPI.Controllers
         {
             var (result, token) = await _userService.AddUserAsync(user);
 
-            if (result.Succeeded)
+            if (result.Succeeded && token != null) 
             {
                 return Ok(new { Token = token });
             }

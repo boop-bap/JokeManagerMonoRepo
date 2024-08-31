@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using JokeAPI.Services;
 using JokeAPI.Entities;
+using JokeAPI.Interfaces;
 using System.Collections.Generic;
 
 namespace JokeAPI.Controllers
@@ -9,9 +10,9 @@ namespace JokeAPI.Controllers
     [Route("api/jokes")]
     public class JokeController : ControllerBase
     {
-        private readonly JokeService _jokeService;
+        private readonly IJokeService _jokeService;
 
-        public JokeController(JokeService jokeService)
+        public JokeController(IJokeService jokeService)
         {
             _jokeService = jokeService;
         }
