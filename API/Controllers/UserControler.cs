@@ -1,27 +1,69 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+
 using JokeAPI.Services;
 using JokeAPI.Entities;
+using JokeAPI.Interfaces;
+using JokeAPI.DTO;
 
 namespace JokeAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-
+    [Route("api/users")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
 
-        [HttpPost("/users")]
-        public ActionResult<User> AddUser([FromBody] User user)
+        // // GET: api/users
+        // [HttpGet]
+        // public ActionResult<IEnumerable<User>> GetAll()
+        // {
+        //     var users = _userService.GetUsers();
+        //     return Ok(users);
+        // }
+
+        // // GET: api/users/{id}
+        // [HttpGet("{id}")]
+        // public ActionResult<User> GetById(int id)
+        // {
+        //     var user = _userService.GetUserById(id);
+        //     if (user == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //     return Ok(user);
+        // }
+
+        // POST: api/users
+        [HttpPost]
+        public async Task<IActionResult> AddUser([FromBody] UserDto user)
         {
-            _userService.AddUser(user.Username, user.Email);
-            return Ok(user);
+            var (result, token) = await _userService.AddUserAsync(user);
+
+            if (result.Succeeded && token != null) 
+            {
+                return Ok(new { Token = token });
+            }
+
+            return BadRequest(result.Errors);
         }
 
+        // // DELETE: api/users/{id}
+        // [HttpDelete("{id}")]
+        // public ActionResult Delete(int id)
+        // {
+        //     var user = _userService.GetUserById(id);
+        //     if (user == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //     _userService.DeleteUser(id);
+        //     return NoContent();
+        // }
     }
 }
