@@ -1,105 +1,79 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
-@inject HttpClient Http
+@using JokeUI.Models
+@inject JokeUI.Services.JokeService JokeService
 @inject ILogger<Home> Logger
 
-@using JokeUI.Models
-
-<PageTitle>Joke Jokes all I can see</PageTitle>
 
 <div class="container">
-    <div>
-        <h2 class="section-heading">Jokes Fetched So Far</h2>
-        <button class="button" @onclick="GetJoke">Get a Random Joke</button>
-    </div>
+    <h1 class="section-heading">Welcome to the Joke Manager</h1>
 
-    <br />
-
-    <div>
-        <h2 class="section-heading">Submit Your Own Joke</h2>
-
-        <h3>Your Joke</h3>
-        <input class="input-field" @bind="jokeInput" placeholder="Enter your joke here" />
-
-        <h3>Category</h3>
-        <input class="input-field" @bind="categoryInput" placeholder="Enter the category" />
-
-        <br />
-
-        <button class="button" @onclick="AddJoke">Add Joke</button>
-
-        <div class="preview">
-            <h4>Preview:</h4>
-            <ul>
-                <li><strong>Joke:</strong> @newJoke.Content</li>
-                <li><strong>Category:</strong> @newJoke.Category</li>
-            </ul>
-        </div>
-    </div>
-
-    <br />
-
-    <div>
-        <h2 class="section-heading">All Jokes</h2>
-        <ul class="joke-list">
-            @foreach (var joke in jokeList)
-            {
-                <li class="joke-item">
-                    <strong>Joke:</strong> @joke.Content<br />
-                    <strong>Category:</strong> @joke.Category<br />
-                    <strong>ID:</strong> @joke.Id
-                </li>
-            }
-        </ul>
-    </div>
-</div>
+    @* <input id="newJoke" @bind="newJokeContent" placeholder="Enter your joke here..." class="input-field" />
+    <input id="newJoke" @bind="newJokeCategory" placeholder="Ente
+    r category here..." class="input-field" /> *@
 
 
-@code {
-    string url = "http://localhost:5087";
-    private static string jokeInput = string.Empty;
-    private static string categoryInput = string.Empty;
-    Joke newJoke = new Joke();
+    @* <button class="button" @onclick="AddJoke">Add Joke</button> *@
+    <button class="button" @onclick="GetRandomJoke">Get Random Joke</button>
 
-    List<Joke> jokeList = new();
-
-    async Task AddJoke()
-    {
-        newJoke.Content = jokeInput;
-        newJoke.Category = categoryInput;
-
-        try
+    <h2>Random Joke</h2>
+    @{
+        if (randomJoke != null)
         {
-            await Http.PostAsJsonAsync($"{url}/add", newJoke);
-            jokeList.Add(newJoke);
+            <p>@randomJoke.Content</p>
+            <p>@randomJoke.Category</p>
         }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error fetching joke");
-        }
-
     }
 
-    async Task GetJoke()
-    {
-        try
-        {
-            Joke joke = await Http.GetFromJsonAsync<Joke>($"{url}/random");
 
-           
-            if (joke != null)
-            {
-                jokeList.Add(joke);
-            }
-            else
-            {
-                Logger.LogWarning("No joke found");
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error fetching joke");
-        }
+    @* <div class="preview">
+    <h2 class="section-heading">Preview</h2>
+    <p>@newJokeContent</p>
+    </div> *@
+
+    @* <div class="joke-list">
+    <h2 class="section-heading">Jokes</h2>
+    @if (jokes == null)
+    {
+    <p><em>Loading...</em></p>
+    }
+
+    else
+    {
+    <ul class="joke-list">
+    @foreach (var joke in jokes)
+    {
+    <li class="joke-item">@joke.Content - @joke.Category</li>
+    }
+    </ul>
+    }
+    </div> *@
+</div>
+
+@code {
+    private int currentCount = 0;
+
+    private string newJokeContent = string.Empty;
+    private string newJokeCategory = string.Empty;
+    private Joke randomJoke;
+    private List<Joke> jokes;
+
+
+
+    @* private async Task AddJoke()
+{
+var newJoke = new Joke { Content = newJokeContent, Category = newJokeCategory };
+var createdJoke = await JokeService.AddJoke(newJoke);
+
+jokes.Add(createdJoke);
+newJokeContent = string.Empty;
+} *@
+
+    private async Task GetRandomJoke()
+    {
+        randomJoke = await JokeService.GetRandomJoke();
+        Logger.LogWarning($"Someone has clicked me! Received joke: {randomJoke.Content}");
+        StateHasChanged();
     }
 }
