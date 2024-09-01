@@ -3,6 +3,8 @@
 
 @using JokeUI.Models
 @using Shared.DTO
+@using System.Collections.ObjectModel
+
 
 @inject JokeUI.Services.JokeService JokeService
 @inject ILogger<Home> Logger
@@ -36,15 +38,14 @@
 
     <div class="joke-list">
         <h2 class="section-heading">Jokes</h2>
-        @if (jokes == null)
+        @if (jokeList == null)
         {
             <p><em>Loading...</em></p>
         }
-
         else
         {
             <ul class="joke-list">
-                @foreach (var joke in jokes)
+                @foreach (var joke in jokeList)
                 {
                     <li class="joke-item">@joke.Content - @joke.Category - @joke.Id</li>
                 }
@@ -55,14 +56,27 @@
 
 @code {
     private int currentCount = 0;
-
     private string newJokeContent = string.Empty;
     private string newJokeCategory = string.Empty;
 
     private int jokeId;
     private Joke randomJoke;
-    private List<Joke> jokes = new List<Joke>();
+    private readonly List<Joke> jokeList = new List<Joke>();
 
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<Joke> fetchedJokes = (await JokeService.GetAllJokes()).ToList(); // Corrected conversion
+
+        foreach (var joke in fetchedJokes)
+        {
+            if (joke.UserId == 1)
+            {
+                jokeList.Add(joke);
+            }
+        }
+    }
 
 
     private async Task AddJoke()
@@ -70,7 +84,7 @@
         var newJoke = new JokeDTO { Content = newJokeContent, Category = newJokeCategory, UserId = 1 };
         Joke createdJokeFromAPI = await JokeService.AddJoke(newJoke);
 
-        jokes.Add(createdJokeFromAPI);
+        jokeList.Add(createdJokeFromAPI);
 
         jokeId = createdJokeFromAPI.Id;
         newJokeContent = string.Empty;
