@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using JokeAPI.Entities;
 using JokeAPI.Interfaces;
+
+using Shared.DTO;
+
 
 namespace JokeAPI.Services
 {
@@ -24,10 +28,12 @@ namespace JokeAPI.Services
             return _jokeRepository.GetById(id);
         }
 
-        public void AddJoke(Joke joke)
+        public Joke AddJoke(JokeDTO joke)
         {
-            var newJoke = new Joke { Content = joke.Content, Category = joke.Category, UserId = 1 };
+            Joke newJoke = new Joke { Content = joke.Content, Category = joke.Category, UserId = joke.UserId };
             _jokeRepository.AddJoke(newJoke);
+
+            return newJoke;
         }
 
         public Joke DeleteJoke(int id)
