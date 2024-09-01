@@ -25,10 +25,10 @@
     transition: background-color 0.3s, transform 0.2s;
 }
 
-    .button:hover {
-        background-color: #2980b9;
-        transform: scale(1.05);
-    }
+.button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
 
 .input-field {
     padding: 12px;
@@ -61,6 +61,6 @@
     margin-bottom: 10px;
 }
 
-    .joke-item:last-child {
-        border-bottom: none;
-    }
+.joke-item:last-child {
+    border-bottom: none;
+}

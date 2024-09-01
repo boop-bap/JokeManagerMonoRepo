@@ -17,10 +17,10 @@ namespace JokeAPI.Services
             _tokenService = tokenService;
         }
 
-        public async Task<(IdentityResult, string)> AddUserAsync(UserDto user)
+        public async Task<(IdentityResult, string)> AddUserAsync(UserDTO user)
         {
 
-              // Generate salt
+            // Generate salt
             var salt = GenerateSalt();
 
             // Hash the password with the salt
@@ -55,7 +55,7 @@ namespace JokeAPI.Services
             rng.GetBytes(saltBytes);
             return Convert.ToBase64String(saltBytes);
         }
-        
+
 
         private static string HashPassword(string password, string salt)
         {

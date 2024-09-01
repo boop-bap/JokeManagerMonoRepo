@@ -2,14 +2,18 @@ using JokeAPI.Services;
 using JokeAPI.Repositories;
 using JokeAPI.Interfaces;
 using JokeAPI.Entities;
+using JokeAPI.Data.DatabaseContext;
+using JokeAPI.Configuration;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DotNetEnv;
-using JokeAPI.Data.DatabaseContext;
 using Microsoft.Extensions.Logging;
+
+using DotNetEnv;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +38,19 @@ builder.Services.AddDbContext<DatabaseContextClass>(options =>
 {
     options.UseNpgsql(connectionString);
     options.LogTo(Console.WriteLine, LogLevel.Information);
+});
+
+// Load JWT settings from environment variables
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var privateKey = Environment.GetEnvironmentVariable("ENV_PRIVATE_KEY");
+var publicKey = Environment.GetEnvironmentVariable("ENV_PUBLIC_KEY");
+
+builder.Services.Configure<JwtSettings>(options =>
+{
+    options.Issuer = jwtSettings["Issuer"];
+    options.Audience = jwtSettings["Audience"];
+    options.PrivateKey = privateKey;
+    options.PublicKey = publicKey;
 });
 
 // Add Identity services

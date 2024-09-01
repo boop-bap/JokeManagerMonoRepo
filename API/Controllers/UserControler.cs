@@ -41,11 +41,11 @@ namespace JokeAPI.Controllers
 
         // POST: api/users
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] UserDto user)
+        public async Task<IActionResult> AddUser([FromBody] UserDTO user)
         {
             var (result, token) = await _userService.AddUserAsync(user);
 
-            if (result.Succeeded && token != null) 
+            if (result.Succeeded && token != null)
             {
                 return Ok(new { Token = token });
             }

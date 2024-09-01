@@ -9,12 +9,9 @@
     <BaseIntermediateOutputPath>./build_output/obj/</BaseIntermediateOutputPath>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Components\Pages\Home\Home.razor.css" />
-  </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Components\Pages\Home\Home.razor.css" />
+      <Compile Include="../Shared/**/*.cs" />
   </ItemGroup>
 
 </Project>
