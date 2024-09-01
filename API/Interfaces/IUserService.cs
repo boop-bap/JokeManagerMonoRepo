@@ -6,8 +6,8 @@ using JokeAPI.DTO;
 
 namespace JokeAPI.Interfaces
 {
-   public interface IUserService
+    public interface IUserService
     {
-        Task<(IdentityResult, string)> AddUserAsync(UserDto user);
+        Task<(IdentityResult, string)> AddUserAsync(UserDTO user);
     }
 }
