@@ -8,6 +8,8 @@ using Uri = System.Uri;
 using JokeUI.Models;
 using JokeUI.Configuration;
 
+using Shared.DTO;
+
 namespace JokeUI.Services
 {
     public class JokeService
@@ -30,10 +32,9 @@ namespace JokeUI.Services
             return await _httpClient.GetFromJsonAsync<Joke>($"api/jokes/{id}");
         }
 
-        public async Task<Joke> AddJoke(Joke joke)
+        public async Task<Joke> AddJoke(JokeDTO joke)
         {
             var response = await _httpClient.PostAsJsonAsync("api/jokes", joke);
-            response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Joke>();
         }
 
