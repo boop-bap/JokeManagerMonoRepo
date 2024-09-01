@@ -1,13 +1,26 @@
 using JokeUI.Components;
+using JokeUI.Services;
+using JokeUI.Configuration;
+using Microsoft.Extensions.Options;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
+// Register AppSettings
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+
 // Register HttpClient
 builder.Services.AddHttpClient();
+
+// Register JokeService
+builder.Services.AddScoped<JokeService>();
 
 // Register logging
 builder.Logging.AddConsole();
