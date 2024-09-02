@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
+using JokeAPI.Interfaces;
 using JokeAPI.Services;
 using JokeAPI.Entities;
-using JokeAPI.Interfaces;
 using JokeAPI.DTO;
 
 namespace JokeAPI.Controllers

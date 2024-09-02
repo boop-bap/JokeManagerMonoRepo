@@ -1,14 +1,14 @@
-using JokeAPI.Services;
-using JokeAPI.Repositories;
-using JokeAPI.Interfaces;
-using JokeAPI.Entities;
 using JokeAPI.Data.DatabaseContext;
 using JokeAPI.Configuration;
+using JokeAPI.Repositories;
+using JokeAPI.Interfaces;
+using JokeAPI.Services;
+using JokeAPI.Entities;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

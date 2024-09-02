@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 using Uri = System.Uri;
+using System.Net.Http;
 
-using JokeUI.Models;
+using Microsoft.Extensions.Options;
+
 using JokeUI.Configuration;
+using JokeUI.Models;
 
 using Shared.DTO;
 

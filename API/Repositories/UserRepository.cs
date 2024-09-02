@@ -1,7 +1,8 @@
 using System.Linq;
-using JokeAPI.Entities;
-using JokeAPI.Interfaces;
+
 using JokeAPI.Data.DatabaseContext;
+using JokeAPI.Interfaces;
+using JokeAPI.Entities;
 
 namespace JokeAPI.Repositories
 {

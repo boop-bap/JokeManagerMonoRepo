@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using JokeAPI.Entities;
-
+using Shared.DTO;
 namespace JokeAPI.Interfaces
 {
     public interface IJokeService
     {
         IEnumerable<Joke> GetAllJokes();
         Joke GetJokeById(int id);
-        void AddJoke(Joke joke);
+        Joke AddJoke(JokeDTO joke);
         Joke DeleteJoke(int id);
         Joke GetRandomJoke();
     }

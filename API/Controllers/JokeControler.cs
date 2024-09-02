@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+
+using JokeAPI.Interfaces;
 using JokeAPI.Services;
 using JokeAPI.Entities;
-using JokeAPI.Interfaces;
-using System.Collections.Generic;
+using Shared.DTO;
 
 namespace JokeAPI.Controllers
 {
@@ -39,12 +41,12 @@ namespace JokeAPI.Controllers
 
         // POST: api/jokes
         [HttpPost]
-        public ActionResult<Joke> Create([FromBody] Joke joke)
+        public ActionResult<Joke> Create([FromBody] JokeDTO joke)
         {
-            _jokeService.AddJoke(joke);
-            return CreatedAtAction(nameof(GetById), new { id = joke.Id }, joke);
+
+            return _jokeService.AddJoke(joke);
         }
-    
+
         // GET: api/jokes/random
         [HttpGet("random")]
         public ActionResult<Joke> GetRandom()
