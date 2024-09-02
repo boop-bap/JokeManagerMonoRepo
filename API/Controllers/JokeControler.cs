@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 
+using JokeAPI.Interfaces;
 using JokeAPI.Services;
 using JokeAPI.Entities;
-using JokeAPI.Interfaces;
 using Shared.DTO;
 
 namespace JokeAPI.Controllers

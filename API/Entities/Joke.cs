@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace JokeAPI.Entities
 {
@@ -8,7 +8,7 @@ namespace JokeAPI.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Content { get; set; }  = string.Empty;
+        public string Content { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
 
         // Foreign key to User
