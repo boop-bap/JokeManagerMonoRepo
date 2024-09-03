@@ -1,5 +1,5 @@
 using JokeAPI.Data.DatabaseContext;
-using JokeAPI.Configuration;
+using JokeAPI.Configurations;
 using JokeAPI.Repositories;
 using JokeAPI.Interfaces;
 using JokeAPI.Services;
@@ -29,6 +29,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IJokeRepository, JokeRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJokeService, JokeService>();
@@ -47,10 +48,10 @@ var publicKey = Environment.GetEnvironmentVariable("ENV_PUBLIC_KEY");
 
 builder.Services.Configure<JwtSettings>(options =>
 {
-    options.Issuer = jwtSettings["Issuer"];
-    options.Audience = jwtSettings["Audience"];
-    options.PrivateKey = privateKey;
-    options.PublicKey = publicKey;
+    options.Issuer = jwtSettings["Issuer"]!;
+    options.Audience = jwtSettings["Audience"]!;
+    options.PrivateKey = privateKey!;
+    options.PublicKey = publicKey!;
 });
 
 // Add Identity services

@@ -1,9 +1,11 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+
 using JokeAPI.Interfaces;
+using JokeAPI.Services;
 using JokeAPI.Entities;
 using JokeAPI.DTO;
-using JokeAPI.Services;
+using Shared.DTO;
 
 namespace JokeAPI.Services
 {
@@ -11,22 +13,18 @@ namespace JokeAPI.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly ITokenService _tokenService;
-        public UserService(UserManager<User> userManager, ITokenService tokenService)
+        private readonly IPasswordService _passwordService;
+        public UserService(UserManager<User> userManager, ITokenService tokenService, IPasswordService passwordService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _passwordService = passwordService;
         }
-
-        public async Task<(IdentityResult, string)> AddUserAsync(UserDTO user)
+        public async Task<(bool Success, string Token, string ErrorMessage)> AddUserAsync(UserDTO user)
         {
+            string salt = _passwordService.GenerateSalt();
+            string hashedPassword = _passwordService.HashPassword(user.Password, salt);
 
-            // Generate salt
-            var salt = GenerateSalt();
-
-            // Hash the password with the salt
-            var hashedPassword = HashPassword(user.Password, salt);
-
-            // Create the user entity
             var newUser = new User
             {
                 UserName = user.UserName,
@@ -38,32 +36,31 @@ namespace JokeAPI.Services
             };
 
             var result = await _userManager.CreateAsync(newUser);
-
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                var token = _tokenService.GenerateJwtToken(user.Id);
-                return (result, token);
+                return (false, null, string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            return (result, null);
+            var token = _tokenService.GenerateJwtToken(newUser);
+            return (true, token, null);
         }
 
-        private static string GenerateSalt()
+        public async Task<(bool Success, string Token, string ErrorMessage)> LoginAsync(LoginDTO loginDetails)
         {
-            var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
-            var saltBytes = new byte[16];
-            rng.GetBytes(saltBytes);
-            return Convert.ToBase64String(saltBytes);
-        }
+            var user = await _userManager.FindByEmailAsync(loginDetails.Email);
+            if (user == null)
+            {
+                return (false, null, "Invalid email or password.");
+            }
 
+            var isPasswordValid = _passwordService.VerifyPassword(user.PasswordHash, loginDetails.Password, user.PasswordSalt);
+            if (!isPasswordValid)
+            {
+                return (false, null, "Invalid email or password.");
+            }
 
-        private static string HashPassword(string password, string salt)
-        {
-            var sha256 = System.Security.Cryptography.SHA256.Create();
-            var saltedPassword = password + salt;
-            var saltedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(saltedPassword);
-            var hashBytes = sha256.ComputeHash(saltedPasswordBytes);
-            return Convert.ToBase64String(hashBytes);
+            var token = _tokenService.GenerateJwtToken(user);
+            return (true, token, null);
         }
     }
 }

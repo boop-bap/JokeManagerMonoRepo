@@ -5,6 +5,7 @@ using JokeAPI.Interfaces;
 using JokeAPI.Services;
 using JokeAPI.Entities;
 using JokeAPI.DTO;
+using Shared.DTO;
 
 namespace JokeAPI.Controllers
 {
@@ -19,51 +20,45 @@ namespace JokeAPI.Controllers
             _userService = userService;
         }
 
-        // // GET: api/users
-        // [HttpGet]
-        // public ActionResult<IEnumerable<User>> GetAll()
-        // {
-        //     var users = _userService.GetUsers();
-        //     return Ok(users);
-        // }
 
-        // // GET: api/users/{id}
-        // [HttpGet("{id}")]
-        // public ActionResult<User> GetById(int id)
-        // {
-        //     var user = _userService.GetUserById(id);
-        //     if (user == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return Ok(user);
-        // }
-
-        // POST: api/users
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> AddUser([FromBody] UserDTO user)
         {
-            var (result, token) = await _userService.AddUserAsync(user);
-
-            if (result.Succeeded && token != null)
+            try
             {
-                return Ok(new { Token = token });
-            }
+                var (success, token, errorMessage) = await _userService.AddUserAsync(user);
 
-            return BadRequest(result.Errors);
+                if (success && token != null)
+                {
+                    return Ok(new { Token = token });
+                }
+
+                return BadRequest(new { Error = errorMessage });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = ex.Message });
+            }
         }
 
-        // // DELETE: api/users/{id}
-        // [HttpDelete("{id}")]
-        // public ActionResult Delete(int id)
-        // {
-        //     var user = _userService.GetUserById(id);
-        //     if (user == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     _userService.DeleteUser(id);
-        //     return NoContent();
-        // }
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginUser([FromBody] LoginDTO loginDetails)
+        {
+            try
+            {
+                var (success, token, errorMessage) = await _userService.LoginAsync(loginDetails);
+
+                if (success)
+                {
+                    return Ok(new { Token = token });
+                }
+
+                return Unauthorized(new { Error = errorMessage });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = ex.Message });
+            }
+        }
     }
 }
