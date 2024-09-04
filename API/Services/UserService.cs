@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 
 using JokeAPI.Interfaces;
@@ -11,15 +10,16 @@ namespace JokeAPI.Services
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<User> _userManager;
+        private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
         private readonly IPasswordService _passwordService;
-        public UserService(UserManager<User> userManager, ITokenService tokenService, IPasswordService passwordService)
+        public UserService(IUserRepository userRepository, ITokenService tokenService, IPasswordService passwordService)
         {
-            _userManager = userManager;
+            _userRepository = userRepository;
             _tokenService = tokenService;
             _passwordService = passwordService;
         }
+
         public async Task<(bool Success, string Token, string ErrorMessage)> AddUserAsync(UserDTO user)
         {
             string salt = _passwordService.GenerateSalt();
@@ -35,7 +35,7 @@ namespace JokeAPI.Services
                 Permissions = user.Permissions
             };
 
-            var result = await _userManager.CreateAsync(newUser);
+            var result = await _userRepository.CreateUserAsync(newUser);
             if (!result.Succeeded)
             {
                 return (false, null, string.Join(", ", result.Errors.Select(e => e.Description)));
@@ -47,7 +47,7 @@ namespace JokeAPI.Services
 
         public async Task<(bool Success, string Token, string ErrorMessage)> LoginAsync(LoginDTO loginDetails)
         {
-            var user = await _userManager.FindByEmailAsync(loginDetails.Email);
+            var user = await _userRepository.FindByEmailAsync(loginDetails.Email);
             if (user == null)
             {
                 return (false, null, "Invalid email or password.");

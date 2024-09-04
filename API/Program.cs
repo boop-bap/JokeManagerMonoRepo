@@ -1,4 +1,4 @@
-using JokeAPI.Data.DatabaseContext;
+using JokeAPI.Data;
 using JokeAPI.Configurations;
 using JokeAPI.Repositories;
 using JokeAPI.Interfaces;

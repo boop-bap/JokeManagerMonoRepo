@@ -1,24 +1,29 @@
-using System.Linq;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
-using JokeAPI.Data.DatabaseContext;
 using JokeAPI.Interfaces;
 using JokeAPI.Entities;
+
 
 namespace JokeAPI.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly DatabaseContextClass _context;
+        private readonly UserManager<User> _userManager;
 
-        public UserRepository(DatabaseContextClass context)
+        public UserRepository(UserManager<User> userManager)
         {
-            _context = context;
+            _userManager = userManager;
         }
 
-        public void AddUser(User user)
+        public async Task<User> FindByEmailAsync(string email)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            return await _userManager.FindByEmailAsync(email);
+        }
+
+        public async Task<IdentityResult> CreateUserAsync(User user)
+        {
+            return await _userManager.CreateAsync(user);
         }
     }
 }

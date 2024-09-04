@@ -31,17 +31,16 @@ namespace JokeAPI.Services
             }
 
             // Convert the PEM format key to an ECDsa object
-            using (var ecdsa = ECDsa.Create())
+            var ecdsa = ECDsa.Create();
+            ecdsa.ImportFromPem(privateKey.ToCharArray());
+
+            // Create the security key
+            var key = new ECDsaSecurityKey(ecdsa);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.EcdsaSha256);
+
+            // Define the claims
+            var claims = new[]
             {
-                ecdsa.ImportFromPem(privateKey.ToCharArray());
-
-                // Create the security key
-                var key = new ECDsaSecurityKey(ecdsa);
-                var creds = new SigningCredentials(key, SecurityAlgorithms.EcdsaSha256);
-
-                // Define the claims
-                var claims = new[]
-                {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(), ClaimValueTypes.Integer64),
@@ -50,18 +49,18 @@ namespace JokeAPI.Services
                     new Claim("permissions", user.Permissions)
                 };
 
-                // Create the token
-                var token = new JwtSecurityToken(
-                    issuer: _jwtSettings.Issuer,
-                    audience: _jwtSettings.Audience,
-                    claims: claims,
-                    notBefore: DateTime.UtcNow,
-                    expires: DateTime.UtcNow.AddMinutes(_jwtSettings.TokenExpiryMinutes),
-                    signingCredentials: creds);
+            // Create the token
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.TokenExpiryMinutes),
+                signingCredentials: creds);
 
-                return new JwtSecurityTokenHandler().WriteToken(token);
-            }
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
         public ClaimsPrincipal ValidateJwtToken(string token)
         {
             // Retrieve the public key from configuration
@@ -92,16 +91,8 @@ namespace JokeAPI.Services
                     IssuerSigningKey = key
                 };
 
-                try
-                {
-                    var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-                    return principal;
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception (not shown here for brevity)
-                    throw new SecurityTokenException("Invalid token", ex);
-                }
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                return principal;
             }
         }
     }
