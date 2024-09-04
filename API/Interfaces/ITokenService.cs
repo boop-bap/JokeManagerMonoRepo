@@ -1,7 +1,9 @@
+using JokeAPI.Entities;
+
 namespace JokeAPI.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateJwtToken(int userId);
+        string GenerateJwtToken(User user);
     }
 }

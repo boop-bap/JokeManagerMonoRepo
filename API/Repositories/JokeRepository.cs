@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using JokeAPI.Data.DatabaseContext;
+using JokeAPI.Data;
 using JokeAPI.Interfaces;
 using JokeAPI.Entities;
 
