@@ -45,22 +45,22 @@ namespace JokeAPI.Services
             return (true, token, null);
         }
 
-        public async Task<(bool Success, string Token, string ErrorMessage)> LoginAsync(LoginDTO loginDetails)
+        public async Task<(bool Success, string Token, string ErrorMessage, User user)> LoginAsync(LoginDTO loginDetails)
         {
             var user = await _userRepository.FindByEmailAsync(loginDetails.Email);
             if (user == null)
             {
-                return (false, null, "Invalid email or password.");
+                return (false, null, "Invalid email or password.", null);
             }
 
             var isPasswordValid = _passwordService.VerifyPassword(user.PasswordHash, loginDetails.Password, user.PasswordSalt);
             if (!isPasswordValid)
             {
-                return (false, null, "Invalid email or password.");
+                return (false, null, "Invalid email or password.", null);
             }
 
             var token = _tokenService.GenerateJwtToken(user);
-            return (true, token, null);
+            return (true, token, null, user);
         }
     }
 }

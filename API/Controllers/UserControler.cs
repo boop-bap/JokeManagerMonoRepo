@@ -46,11 +46,17 @@ namespace JokeAPI.Controllers
         {
             try
             {
-                var (success, token, errorMessage) = await _userService.LoginAsync(loginDetails);
+                var (success, token, errorMessage, user) = await _userService.LoginAsync(loginDetails);
 
                 if (success)
                 {
-                    return Ok(new { Token = token });
+                    return Ok(new
+                    {
+                        Token = token,
+                        Id = user.Id,
+                        Role = user.Role,
+                        Email = user.Email,
+                    });
                 }
 
                 return Unauthorized(new { Error = errorMessage });

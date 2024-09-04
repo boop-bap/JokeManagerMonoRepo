@@ -9,6 +9,6 @@ namespace JokeAPI.Interfaces
     public interface IUserService
     {
         Task<(bool Success, string Token, string ErrorMessage)> AddUserAsync(UserDTO user);
-        Task<(bool Success, string Token, string ErrorMessage)> LoginAsync(LoginDTO loginDetails);
+        Task<(bool Success, string Token, string ErrorMessage, User user)> LoginAsync(LoginDTO loginDetails);
     }
 }
